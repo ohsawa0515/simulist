@@ -15,8 +15,8 @@ monolog:
     handlers:
         main:
             type:  stream
-            path:  "%kernel.logs_dir%/%kernel.environment%.log"
-            level: debug
+            path:  "/var/log/symfony/simlist-%kernel.environment%.log"
+            level: info
         firephp:
             type:  firephp
             level: info
