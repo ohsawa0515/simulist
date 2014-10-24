@@ -10,7 +10,7 @@ branches:
 
 env:
   global:
-    - secure: RqfxRztTAmlB+9eCU5j5m5FTyXHWoxnLKzLZS8W4pPGRJXS95CrmdiQWq1DPtegH31Os5GR/DTeroiecEhMMTeZPuqu60ycF/mRlWfz7b1objEyya1IaIsFMYd0xdsedKOzo8h+YySdS3Ni+UkxPHPJ3JVMTHFBNj7EubOHtl8c=
+    - secure: heFmLyneiL2pu5relWb0Sq+TqyVND9C6lDubW0CM2SsqoUw4NmX0kEyH5VlyzKp2jvgX8jZmmQQxRmt1d1Dw5YXgNyWFRQQo/wZT230iauTz1v1nkKvcbyV2ncbxu6/Xdtba+uidYggrOGsr6de/sa3P9dWJaCiTlEqewcO1PeA=
 
 before_script:
   - printf "\n" | pecl install memcached
