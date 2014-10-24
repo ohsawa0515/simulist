@@ -8,9 +8,18 @@ branches:
    - master
    - develop
 
+# global.securet
+# database.host
+# database.name
+# database.password
+# database.user
 env:
   global:
     - secure: heFmLyneiL2pu5relWb0Sq+TqyVND9C6lDubW0CM2SsqoUw4NmX0kEyH5VlyzKp2jvgX8jZmmQQxRmt1d1Dw5YXgNyWFRQQo/wZT230iauTz1v1nkKvcbyV2ncbxu6/Xdtba+uidYggrOGsr6de/sa3P9dWJaCiTlEqewcO1PeA=
+    - secure: b+IuxmDMogHfkFzkSG5339LmdKABRiQVt8ZK5tXJKxsvrVeyE3cVTaOTatNyhNxxOk02TSpM6kRY/PJfMnV7TBePakYo3ZKC+ePN2QaKcYbACLSwmyJA9ikm674JlOgGOY3Nn23Oq0KZ6XD49hYK10u70N5Rx7SyQviDpq92ZXw=
+    - secure: fhhrhKZ9dgkIOI5BXULR/eFOKwRJZMvDPEEKJnz84CwXboVr9F7bD5vCz7F6PtXXdyx2yoRSBorpmLOCRDrPGSHnPK9xPQispCNU72z+av6OXD672uQAc7dbtfD/Dc83kGKrlUCVmey/weqPZkzdHmp8e5EofKYuoCSUVOnv3T0=
+    - secure: nqG2nNnlxFV9xqnffvBlfJh4va+L0/muRtJ1N6+xF6AG+N0LQQ41f+sEPeXZwUmcG7fNaWDDRenKCSfwuvWoFuSHwK8/h/BYtjLKL6tdsxMmBBzPotjrGydpSd7RPx+QHmF57T+KkWAMAAhsfsp/VOZgfZDL2YknSUy6XtXp6eg=
+    - secure: RJo1iRLH5iyy3kpptC8XHPyOy7EIP85pVEQft/ANJZI6ntAieRtVJg6/dFVbubZacouLPc1kpXCr4HB0pzB4hITkKpwUZwjKolqmITa9nBlHyNFycJ2ZP/ZBQZtcYqfUifA1F2Deip7I6GhWEiw29sejH/O0dwp8u5IOAlQyugI=
 
 before_script:
   - printf "\n" | pecl install memcached
