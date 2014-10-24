@@ -12,5 +12,12 @@ web_profiler:
     toolbar: false
     intercept_redirects: false
 
+monolog:
+    handlers:
+        main:
+            type:  stream
+            path:  "%kernel.logs_dir%/%kernel.environment%.log"
+            level: info
+
 swiftmailer:
     disable_delivery: true
