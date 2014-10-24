@@ -1,0 +1,32 @@
+language: php
+
+php:
+ - 5.5
+
+branches:
+  only:
+   - master
+   - develop
+
+env:
+  global:
+    - secure: RqfxRztTAmlB+9eCU5j5m5FTyXHWoxnLKzLZS8W4pPGRJXS95CrmdiQWq1DPtegH31Os5GR/DTeroiecEhMMTeZPuqu60ycF/mRlWfz7b1objEyya1IaIsFMYd0xdsedKOzo8h+YySdS3Ni+UkxPHPJ3JVMTHFBNj7EubOHtl8c=
+
+before_script:
+  - printf "\n" | pecl install memcached
+  - echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - composer install -n --dev
+
+script:
+ - mkdir -p build/logs
+ - phpunit -c app
+
+# - php bin/coveralls -v
+
+deploy:
+  provider: heroku
+  api_key
+    secure: RqfxRztTAmlB+9eCU5j5m5FTyXHWoxnLKzLZS8W4pPGRJXS95CrmdiQWq1DPtegH31Os5GR/DTeroiecEhMMTeZPuqu60ycF/mRlWfz7b1objEyya1IaIsFMYd0xdsedKOzo8h+YySdS3Ni+UkxPHPJ3JVMTHFBNj7EubOHtl8c=
+  app:
+    master:  simulist
+    develop: simulist
