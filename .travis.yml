@@ -32,10 +32,10 @@ script:
 
 # - php bin/coveralls -v
 
-deploy:
-  provider: heroku
-  api_key:
-    secure: rd/S4k7TL6OdU3XmydtYBTR1zkKqeppmUlD6xJXsmNkOuVXrISx0VE/WehhZ+aIJPgDKsdG+SH+XH3yaXZjmJiijw/j62kLa/j8w97ruhxRnEK0iL0RGKT28oc2jALpV6tlKQr3v1tZ2ZgTryTYFjrKL/kyFMYS2/ltL052JjWc=
-  app:
-    master:  simulist
-    develop: simulist
+#deploy:
+#  provider: heroku
+#  api_key:
+#    secure: rd/S4k7TL6OdU3XmydtYBTR1zkKqeppmUlD6xJXsmNkOuVXrISx0VE/WehhZ+aIJPgDKsdG+SH+XH3yaXZjmJiijw/j62kLa/j8w97ruhxRnEK0iL0RGKT28oc2jALpV6tlKQr3v1tZ2ZgTryTYFjrKL/kyFMYS2/ltL052JjWc=
+#  app:
+#    master:  simulist
+#    develop: simulist
