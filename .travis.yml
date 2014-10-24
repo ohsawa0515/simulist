@@ -25,7 +25,7 @@ script:
 
 deploy:
   provider: heroku
-  api_key
+  api_key:
     secure: RqfxRztTAmlB+9eCU5j5m5FTyXHWoxnLKzLZS8W4pPGRJXS95CrmdiQWq1DPtegH31Os5GR/DTeroiecEhMMTeZPuqu60ycF/mRlWfz7b1objEyya1IaIsFMYd0xdsedKOzo8h+YySdS3Ni+UkxPHPJ3JVMTHFBNj7EubOHtl8c=
   app:
     master:  simulist
