@@ -1,0 +1,5 @@
+shu1_simulist:
+    resource: "@Shu1SimulistBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
