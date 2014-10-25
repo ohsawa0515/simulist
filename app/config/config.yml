@@ -31,8 +31,33 @@ twig:
 assetic:
     debug:          "%kernel.debug%"
     use_controller: false
-    bundles:        [ ]
+    bundles:        [ Shu1SimulistBundle ]
     #java: /usr/bin/java
+    assets:
+        font-awesome-eot:
+            inputs: '%kernel.root_dir%/../src/Shu1/SimulistBundle/Resources/public/fonts/fontawesome-webfont.eot'
+            output: 'fonts/fontawesome-webfont.eot'
+        font-awesome-svg:
+            inputs: '%kernel.root_dir%/../src/Shu1/SimulistBundle/Resources/public/fonts/fontawesome-webfont.svg'
+            output: 'fonts/fontawesome-webfont.svg'
+        font-awesome-ttf:
+            inputs: '%kernel.root_dir%/../src/Shu1/SimulistBundle/Resources/public/fonts/fontawesome-webfont.ttf'
+            output: 'fonts/fontawesome-webfont.ttf'
+        font-awesome-woff:
+            inputs: '%kernel.root_dir%/../src/Shu1/SimulistBundle/Resources/public/fonts/fontawesome-webfont.woff'
+            output: 'fonts/fontawesome-webfont.woff'
+        glyphicons-halflings-regular-eot:
+            inputs: '%kernel.root_dir%/../src/Shu1/SimulistBundle/Resources/public/fonts/glyphicons-halflings-regular.eot'
+            output: 'fonts/glyphicons-halflings-regular.eot'
+        glyphicons-halflings-regular-svg:
+            inputs: '%kernel.root_dir%/../src/Shu1/SimulistBundle/Resources/public/fonts/glyphicons-halflings-regular.svg'
+            output: 'fonts/glyphicons-halflings-regular.svg'
+        glyphicons-halflings-regular-ttf:
+            inputs: '%kernel.root_dir%/../src/Shu1/SimulistBundle/Resources/public/fonts/glyphicons-halflings-regular.ttf'
+            output: 'fonts/glyphicons-halflings-regular.ttf'
+        glyphicons-halflings-regular-woff:
+            inputs: '%kernel.root_dir%/../src/Shu1/SimulistBundle/Resources/public/fonts/glyphicons-halflings-regular.woff'
+            output: 'fonts/glyphicons-halflings-regular.woff'
     filters:
         cssrewrite: ~
         #closure:
