@@ -16,6 +16,7 @@ class AppKernel extends Kernel
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+            new Shu1\SimulistBundle\Shu1SimulistBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('heroku', 'dev', 'test'))) {
