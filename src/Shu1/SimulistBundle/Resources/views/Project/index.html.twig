@@ -25,7 +25,8 @@
                     {% endif %}
                 </td>
                 <td>
-                    <span class="glyphicon glyphicon-trash"></span>
+                    <a href="{{ path('project_delete', { 'id': list.id, 'identify': project.identify }) }}"><span
+                                class="glyphicon glyphicon-trash"></span></a>
                 </td>
             </tr>
         {% endfor %}
