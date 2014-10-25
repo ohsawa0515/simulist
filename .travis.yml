@@ -25,6 +25,7 @@ before_script:
   - printf "\n" | pecl install memcached
   - echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - composer install -n --dev
+  - php app/console doctrine:fixtures:load --no-interaction --env test
 
 script:
  - mkdir -p build/logs
