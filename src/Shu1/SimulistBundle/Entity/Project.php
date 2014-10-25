@@ -3,12 +3,14 @@
 namespace Shu1\SimulistBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Project
  *
  * @ORM\Table(name="project", uniqueConstraints={@ORM\UniqueConstraint(name="identify_UNIQUE", columns={"identify"})})
  * @ORM\Entity
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  */
 class Project
 {
@@ -60,6 +62,7 @@ class Project
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
     private $createdAt;
 
@@ -74,6 +77,7 @@ class Project
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
      */
     private $updatedAt;
 

@@ -3,12 +3,14 @@
 namespace Shu1\SimulistBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Lists
  *
  * @ORM\Table(name="lists", indexes={@ORM\Index(name="fk_list_project_idx", columns={"project_id"}), @ORM\Index(name="fk_list_member1_idx", columns={"member_id"})})
  * @ORM\Entity
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  */
 class Lists
 {
@@ -60,6 +62,7 @@ class Lists
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="create")
      */
     private $createdAt;
 
@@ -74,6 +77,7 @@ class Lists
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=false)
+     * @Gedmo\Timestampable(on="update")
      */
     private $updatedAt;
 
