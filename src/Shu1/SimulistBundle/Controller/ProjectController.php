@@ -72,7 +72,6 @@ class ProjectController extends Controller
     {
         // TODO レスポンス形式はとりあえず適当
         // TODO HTTPメソッドをPOSTからDELETEに変更する予定
-        // TODO deleteではなくてdeleted_atに変更する予定
 
         $id = $request->get('id');
         $identify = $request->get('identify');
