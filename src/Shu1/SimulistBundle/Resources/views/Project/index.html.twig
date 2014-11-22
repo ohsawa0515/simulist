@@ -6,6 +6,41 @@
     {{ parent() }}
     <script>
         $(function () {
+            // タスクの完了
+            $(document).on('click', '.done-task', function () {
+                var task_id = $(this).parent().parent().data('id');
+                var input = $(this);
+                var status;
+                if ($(this).hasClass('done')) {
+                    // タスク完了の場合は未完了
+                    status = 0;
+                } else {
+                    // タスク未完了の場合は完了
+                    status = 1;
+                }
+                $.ajax({
+                    url: "{{ path('project_done') }}",
+                    type: "POST",
+                    data: {
+                        "id": task_id,
+                        "status": status
+                    },
+                    success: function (data) {
+                        if (input.hasClass('done')) {
+                            input.removeClass('done');
+                            $('tr#task_' + task_id).children('td:eq(1)').children().children().removeClass('text-muted').unwrap();
+                        } else {
+                            input.addClass('done');
+                            $('tr#task_' + task_id).children('td:eq(1)').children().addClass('text-muted').wrap('<del />');
+                        }
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            });
+
+            // タスクの削除
             $(document).on('click', '.delete-task', function () {
                 if (confirm('タスクを削除してもよろしいですか?')) {
                     var task_id = $(this).parent().parent().data('id'),
@@ -47,14 +82,14 @@
                 <td>
                     {# status = 1 => done #}
                     {% if list.status == 1 %}
-                        <input type="checkbox" class="done-task" value="{{ list.id }}" checked>
+                        <input type="checkbox" class="done done-task" value="{{ list.id }}" checked>
                     {% else %}
                         <input type="checkbox" class="done-task" value="{{ list.id }}">
                     {% endif %}
                 </td>
                 <td>
                     {% if list.status == 1 %}
-                        <span class="text-muted"><del>{{ list.todo }}</del></span>
+                        <del><span class="text-muted">{{ list.todo }}</span></del>
                     {% else %}
                         <span>{{ list.todo }}</span>
                     {% endif %}

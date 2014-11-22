@@ -61,7 +61,47 @@ class ProjectController extends Controller
     }
 
     /**
-     * Todoリストの削除
+     * タスクの完了
+     *
+     * @Route("/done/", name="project_done")
+     * @Method({"POST"})
+     *
+     * @return Respose
+     */
+    public function doneAction(Request $request)
+    {
+        // TODO レスポンス形式はとりあえず適当
+        // TODO doneAction, deleteActionは別コントローラに移す(TaskControllerとか)
+        // FIXME update_atが動いていない
+        $id     = $request->get('id');
+        $status = $request->get('status');
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $queryBuilder  = $entityManager->createQueryBuilder();
+        try {
+            $queryBuilder
+                ->update('Shu1SimulistBundle:Lists', 'l')
+                ->set('l.status', $status)
+                ->where('l.id = :id')
+                ->setParameter('id', $id);
+            $result = $queryBuilder->getQuery()->execute();
+            $entityManager->flush();
+        } catch (\Exception $exception) {
+            $this->get('logger')->error($exception->getMessage());
+
+            return new Response('ng', 404);
+        }
+
+        if (!$request) {
+            return new Response('ng', 404);
+        }
+
+        return new Response('ok', 200);
+    }
+
+
+    /**
+     * タスクの削除
      *
      * @Route("/delete/", name="project_delete")
      * @Method({"POST"})
@@ -72,8 +112,9 @@ class ProjectController extends Controller
     {
         // TODO レスポンス形式はとりあえず適当
         // TODO HTTPメソッドをPOSTからDELETEに変更する予定
+        // TODO プロジェクトIDはいらないかも？ジョインするだけ遅くなるし意味がない気がする
 
-        $id = $request->get('id');
+        $id       = $request->get('id');
         $identify = $request->get('identify');
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -90,6 +131,7 @@ class ProjectController extends Controller
             $list = $queryBuilder->getQuery()->getSingleResult();
         } catch (\Exception $exception) {
             $this->get('logger')->error($exception->getMessage());
+
             return new Response('ng', 404);
         }
 
