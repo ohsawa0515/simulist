@@ -4,7 +4,10 @@ namespace Shu1\SimulistBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Todoリストのプロジェクトコントローラ
@@ -60,15 +63,20 @@ class ProjectController extends Controller
     /**
      * Todoリストの削除
      *
-     * @Route("/{identify}/{id}/delete", name="project_delete")
+     * @Route("/delete/", name="project_delete")
+     * @Method({"POST"})
      *
-     * @param int    $id
-     * @param string $identify
-     *
-     * @return mixed
+     * @return Respose
      */
-    public function deleteAction($id, $identify)
+    public function deleteAction(Request $request)
     {
+        // TODO レスポンス形式はとりあえず適当
+        // TODO HTTPメソッドをPOSTからDELETEに変更する予定
+        // TODO deleteではなくてdeleted_atに変更する予定
+
+        $id = $request->get('id');
+        $identify = $request->get('identify');
+
         $entityManager = $this->getDoctrine()->getManager();
         $queryBuilder  = $entityManager->createQueryBuilder();
         try {
@@ -82,19 +90,19 @@ class ProjectController extends Controller
                 ->setParameter('id', $id);
             $list = $queryBuilder->getQuery()->getSingleResult();
         } catch (\Exception $exception) {
-            echo $exception->getMessage();
-            exit;
+            $this->get('logger')->error($exception->getMessage());
+            return new Response('ng', 404);
         }
 
         // 見つからない場合
         if (!$list) {
-            throw $this->createNotFoundException('リストが見つかりませんでした');
+            return new Response('ng', 404);
         }
 
         $entityManager->remove($list);
         $entityManager->flush();
 
-        return $this->redirect($this->generateUrl('project_index', ['identify' => $identify]));
+        return new Response('ok', 200);
     }
 
 } 

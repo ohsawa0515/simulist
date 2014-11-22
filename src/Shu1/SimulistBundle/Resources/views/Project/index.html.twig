@@ -2,10 +2,39 @@
 
 {% block title %}{{ project.name }}{% endblock %}
 
+{% block header_javascripts %}
+    {{ parent() }}
+    <script>
+        $(function () {
+            $(document).on('click', '.delete-task', function () {
+                if (confirm('タスクを削除してもよろしいですか?')) {
+                    var task_id = $(this).parent().parent().data('id'),
+                            project_id = $('table.todo').data('project');
+                    $.ajax({
+                        url: "{{ path('project_delete') }}",
+                        type: "POST",
+                        data: {
+                            "identify": project_id,
+                            "id": task_id
+                        },
+                        success: function (data) {
+                            $('#task_' + task_id).fadeOut(800);
+                        },
+                        error: function (data) {
+                            console.log(data);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
+
 {% block body %}
     <h1>{{ project.name }}</h1>
     <!-- Table -->
-    <table class="table">
+    <table class="todo table" data-project="{{ project.identify }}">
         <thead>
         <th>done</th>
         <th>todo</th>
@@ -14,7 +43,7 @@
         </thead>
         <tbody>
         {% for list in lists %}
-            <tr>
+            <tr id="task_{{ list.id }}" data-id="{{ list.id }}">
                 <td>
                     <input type="checkbox" value="{{ list.id }}">
                 </td>
@@ -25,8 +54,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ path('project_delete', { 'id': list.id, 'identify': project.identify }) }}"><span
-                                class="glyphicon glyphicon-trash"></span></a>
+                    <span class="delete-task glyphicon glyphicon-trash"></span>
                 </td>
             </tr>
         {% endfor %}
