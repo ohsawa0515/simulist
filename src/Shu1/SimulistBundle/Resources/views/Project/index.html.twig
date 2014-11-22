@@ -45,9 +45,20 @@
         {% for list in lists %}
             <tr id="task_{{ list.id }}" data-id="{{ list.id }}">
                 <td>
-                    <input type="checkbox" value="{{ list.id }}">
+                    {# status = 1 => done #}
+                    {% if list.status == 1 %}
+                        <input type="checkbox" class="done-task" value="{{ list.id }}" checked>
+                    {% else %}
+                        <input type="checkbox" class="done-task" value="{{ list.id }}">
+                    {% endif %}
                 </td>
-                <td>{{ list.todo }}</td>
+                <td>
+                    {% if list.status == 1 %}
+                        <span class="text-muted"><del>{{ list.todo }}</del></span>
+                    {% else %}
+                        <span>{{ list.todo }}</span>
+                    {% endif %}
+                </td>
                 <td>
                     {% if list.timeLimit is not empty %}
                         {{ list.timeLimit|date('Y-m-d H:i:s') }}
