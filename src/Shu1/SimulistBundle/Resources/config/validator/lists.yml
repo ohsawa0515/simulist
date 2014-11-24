@@ -1,0 +1,9 @@
+Shu1\SimulistBundle\Entity\Lists:
+    properties:
+        todo:
+            - NotBlank:
+                message: "タスクが入力されていません"
+            - Length:
+                min: 0
+                max: 300
+                maxMessage: "最大{{ limit }}文字までしか入力できません"

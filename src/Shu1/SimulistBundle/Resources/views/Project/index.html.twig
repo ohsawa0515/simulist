@@ -5,9 +5,41 @@
 {% block header_javascripts %}
     {{ parent() }}
     <script>
+
+        // Ajax通信時にトークンを埋め込む
+        var csrf_token = '{{ csrf_token }}';
+        $(window).on('ajaxSend', function(elm, xhr, s) {
+            xhr.setRequestHeader('X-CSRF-Token', csrf_token);
+        });
+
         $(function () {
-            // タスクの追加
+
             $('#input-task').focus();
+
+            // タスクの追加
+            $('#add-task').click(function () {
+
+                event.preventDefault();
+
+                var task = $('#input-task').val(),
+                        identify = $('#input-identify').val();
+
+                $.ajax({
+                    url: "{{ path('project_add') }}",
+                    type: "POST",
+                    data: {
+                        "task": task,
+                        "identify": identify
+                    },
+                    success: function (data) {
+                        console.log(data);
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+
+                });
+            });
 
             // タスクの完了
             $(document).on('click', '.done-task', function () {
@@ -77,6 +109,7 @@
         <div class="col-md-10">
             <div class="form-group">
                 <input type="text" class="form-control col-md-12" id="input-task" placeholder="タスクを入力してください">
+                <input type="hidden" id="input-identify" value="{{ project.identify }}">
             </div>
         </div>
         <div class="col-md-2">

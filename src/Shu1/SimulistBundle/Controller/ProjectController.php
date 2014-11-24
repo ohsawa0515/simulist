@@ -2,6 +2,8 @@
 
 namespace Shu1\SimulistBundle\Controller;
 
+use Shu1\SimulistBundle\Entity\Lists;
+use Shu1\SimulistBundle\Form\TaskType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -50,14 +52,74 @@ class ProjectController extends Controller
                 ->setParameter('identify', $identify);
             $lists = $queryBuilder->getQuery()->getResult();
         } catch (\Exception $exception) {
-            echo $exception->getMessage();
-            exit;
+            $this->get('logger')->error($exception->getMessage());
+
+            return [];
         }
 
+        // CSRF対策のトークン発行
+        $token = $this->get('form.csrf_provider')->generateCsrfToken('csrf_token');
+
         return [
-            'project' => $project,
-            'lists'   => $lists,
+            'project'    => $project,
+            'lists'      => $lists,
+            'csrf_token' => $token
         ];
+    }
+
+    /**
+     * タスクの追加
+     *
+     * @Route("/add/", name="project_add")
+     * @Method({"POST"})
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function addAction(Request $request)
+    {
+        // TODO レスポンス形式はとりあえず適当
+        // TODO addAction, doneAction, deleteActionは別コントローラに移す(TaskControllerとか)
+        $task = $request->get('task');
+
+        // CSRF対策のトークン検証
+        $token = $request->headers->get('X-CSRF-Token');
+        if (false === $this->get('form.csrf_provider')->isCsrfTokenValid('csrf_token', $token)) {
+            return new Response('token is invalid.', 400);
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $project = $entityManager->getRepository('Shu1SimulistBundle:Project')->findOneBy(
+            [
+                'identify' => $request->get('identify'),
+            ]
+        );
+
+        if (!$project) {
+            return new Response('ng', 404);
+        }
+
+        $lists = new Lists();
+        $lists->setTodo($task);
+        $lists->setProject($project);
+        // TODO 他のTODOのPositionを変更する処理が必要
+        $lists->setPosition(0);
+        $lists->setStatus(0);
+
+        $validator = $this->get('validator');
+        $errors    = $validator->validate($lists);
+
+        if (count($errors) > 0) {
+            return new Response((string)$errors, 400);
+        }
+
+        $entityManager->persist($lists);
+        $entityManager->flush();
+
+        return new Response('ok', 200);
+
     }
 
     /**
@@ -71,7 +133,6 @@ class ProjectController extends Controller
     public function doneAction(Request $request)
     {
         // TODO レスポンス形式はとりあえず適当
-        // TODO doneAction, deleteActionは別コントローラに移す(TaskControllerとか)
         // FIXME update_atが動いていない
         $id     = $request->get('id');
         $status = $request->get('status');
