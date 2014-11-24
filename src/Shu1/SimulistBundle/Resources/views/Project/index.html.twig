@@ -6,6 +6,9 @@
     {{ parent() }}
     <script>
         $(function () {
+            // タスクの追加
+            $('#input-task').focus();
+
             // タスクの完了
             $(document).on('click', '.done-task', function () {
                 var task_id = $(this).parent().parent().data('id');
@@ -68,6 +71,19 @@
 
 {% block body %}
     <h1>{{ project.name }}</h1>
+
+    <!-- form -->
+    <form class="form-horizontal" role="form" action="" method="post">
+        <div class="col-md-10">
+            <div class="form-group">
+                <input type="text" class="form-control col-md-12" id="input-task" placeholder="タスクを入力してください">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" id="add-task" class="btn btn-primary">登録</button>
+        </div>
+    </form>
+
     <!-- Table -->
     <table class="todo table" data-project="{{ project.identify }}">
         <thead>
