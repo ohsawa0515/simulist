@@ -111,6 +111,21 @@
                     });
                 }
             });
+
+            // タスクの並び替え
+            $("table.todo tbody").sortable({
+                axis: 'y',
+                opacity: 0.1,
+                update: function() {
+                    $.ajax({
+                        url: "{{ path('project_sort') }}",
+                        type: "POST",
+                        data: {
+                            sort: $(this).sortable('serialize')
+                        }
+                    })
+                }
+            });
         });
     </script>
 

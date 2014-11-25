@@ -181,7 +181,6 @@ class ProjectController extends Controller
         return new Response('ok', 200);
     }
 
-
     /**
      * タスクの削除
      *
@@ -224,6 +223,22 @@ class ProjectController extends Controller
 
         $entityManager->remove($list);
         $entityManager->flush();
+
+        return new Response('ok', 200);
+    }
+
+    /**
+     * @Route("/sort/", name="project_sort")
+     * @Method({"POST"})
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function sortAction(Request $request)
+    {
+        // TODO レスポンス形式はとりあえず適当
+        $this->get('logger')->info(print_r($request->get('sort'), true));
 
         return new Response('ok', 200);
     }
