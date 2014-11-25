@@ -8,7 +8,7 @@
 
         // Ajax通信時にトークンを埋め込む
         var csrf_token = '{{ csrf_token }}';
-        $(window).on('ajaxSend', function(elm, xhr, s) {
+        $(window).on('ajaxSend', function (elm, xhr, s) {
             xhr.setRequestHeader('X-CSRF-Token', csrf_token);
         });
 
@@ -31,8 +31,23 @@
                         "task": task,
                         "identify": identify
                     },
-                    success: function (data) {
-                        console.log(data);
+                    success: function (id) {
+                        var e = $(
+                                '<tr id="task_' + id + '" data-id="' + id + '">' +
+                                        '<td>' +
+                                        '<input type="checkbox" class="done-task" value="' + id + '">' +
+                                        '</td>' +
+                                        '<td>' +
+                                        '<span class="edit-task">' + task + '</span>' +
+                                        '</td>' +
+                                        '<td></td>' +
+                                        '<td>' +
+                                        '<button type="button" class="delete-task btn btn-link">Delete</button>' +
+                                        '</td>' +
+                                        '</tr>'
+                        );
+                        $('tbody').prepend(e);
+                        $('#input-task').val('').focus();
                     },
                     error: function (data) {
                         console.log(data);

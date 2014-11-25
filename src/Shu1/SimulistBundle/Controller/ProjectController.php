@@ -118,7 +118,10 @@ class ProjectController extends Controller
         $entityManager->persist($lists);
         $entityManager->flush();
 
-        return new Response('ok', 200);
+        // 追加したタスクのIDを取得(=Last Insert ID)
+        $id = $lists->getId();
+
+        return new Response($id, 200);
 
     }
 
