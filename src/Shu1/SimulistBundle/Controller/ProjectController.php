@@ -77,6 +77,8 @@ class ProjectController extends Controller
     /**
      * タスクの追加
      *
+     * 各タスクのpositionはDoctrineExtensionのSortableで更新している
+     *
      * @Route("/add/", name="project_add")
      * @Method({"POST"})
      *
@@ -97,7 +99,6 @@ class ProjectController extends Controller
         }
 
         $entityManager = $this->getDoctrine()->getManager();
-        $queryBuilder  = $entityManager->createQueryBuilder();
 
         $project = $entityManager->getRepository('Shu1SimulistBundle:Project')->findOneBy(
             [
@@ -110,9 +111,6 @@ class ProjectController extends Controller
         }
 
         // TODO リポジトリに移す
-        $connection = $entityManager->getConnection();
-        $connection->beginTransaction();
-
         try {
             $lists = new Lists();
             $lists->setTodo($task);
@@ -128,21 +126,9 @@ class ProjectController extends Controller
             }
 
             $entityManager->persist($lists);
-
-            // 既存のタスクのpositionを更新
-            $queryBuilder
-                ->update('Shu1SimulistBundle:Lists', 'l')
-                ->set('l.position', 'l.position + 1')
-                ->where('l.project = :project')
-                ->setParameter('project', $project);
-
-            $queryBuilder->getQuery()->execute();
-
             $entityManager->flush();
-            $connection->commit();
 
         } catch (\Exception $exception) {
-            $connection->rollback();
             $this->get('logger')->error($exception->getMessage());
             return new Response($exception->getMessage(), 503);
         }
