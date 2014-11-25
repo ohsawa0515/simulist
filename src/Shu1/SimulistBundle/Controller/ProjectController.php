@@ -165,7 +165,6 @@ class ProjectController extends Controller
     public function doneAction(Request $request)
     {
         // TODO レスポンス形式はとりあえず適当
-        // FIXME update_atが動いていない
         $id     = $request->get('id');
         $status = $request->get('status');
 
@@ -174,9 +173,13 @@ class ProjectController extends Controller
         try {
             $queryBuilder
                 ->update('Shu1SimulistBundle:Lists', 'l')
-                ->set('l.status', $status)
+                ->set('l.status', ':status')
+                ->set('l.updatedAt', ':now')
                 ->where('l.id = :id')
-                ->setParameter('id', $id);
+                ->setParameter('id', $id)
+                ->setParameter('status', $status)
+                ->setParameter('now', new \DateTime())
+            ;
             $queryBuilder->getQuery()->execute();
             $entityManager->flush();
         } catch (\Exception $exception) {
