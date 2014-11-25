@@ -44,17 +44,24 @@ class ProjectController extends Controller
 
         $queryBuilder = $entityManager->createQueryBuilder();
         try {
+            // TODO SQLが遅いのでチューニングする
+            // TODO リポジトリに移す
             $queryBuilder
-                ->select('l, p')
+                ->select('l')
                 ->from('Shu1SimulistBundle:Lists', 'l')
                 ->innerJoin('l.project', 'p')
                 ->where('p.identify = :identify')
-                ->setParameter('identify', $identify);
+                ->setParameter('identify', $identify)
+                ->orderBy('l.position', 'ASC')
+                ->addOrderBy('l.createdAt', 'DESC')
+            ;
             $lists = $queryBuilder->getQuery()->getResult();
         } catch (\Exception $exception) {
             $this->get('logger')->error($exception->getMessage());
 
-            return [];
+            return [
+                'csrf_token' => $token,
+            ];
         }
 
         // CSRF対策のトークン発行
@@ -90,6 +97,7 @@ class ProjectController extends Controller
         }
 
         $entityManager = $this->getDoctrine()->getManager();
+        $queryBuilder  = $entityManager->createQueryBuilder();
 
         $project = $entityManager->getRepository('Shu1SimulistBundle:Project')->findOneBy(
             [
@@ -101,22 +109,43 @@ class ProjectController extends Controller
             return new Response('ng', 404);
         }
 
-        $lists = new Lists();
-        $lists->setTodo($task);
-        $lists->setProject($project);
-        // TODO 他のTODOのPositionを変更する処理が必要
-        $lists->setPosition(0);
-        $lists->setStatus(0);
+        // TODO リポジトリに移す
+        $connection = $entityManager->getConnection();
+        $connection->beginTransaction();
 
-        $validator = $this->get('validator');
-        $errors    = $validator->validate($lists);
+        try {
+            $lists = new Lists();
+            $lists->setTodo($task);
+            $lists->setProject($project);
+            $lists->setPosition(0);
+            $lists->setStatus(0);
 
-        if (count($errors) > 0) {
-            return new Response((string)$errors, 400);
+            $validator = $this->get('validator');
+            $errors    = $validator->validate($lists);
+
+            if (count($errors) > 0) {
+                return new Response((string)$errors, 400);
+            }
+
+            $entityManager->persist($lists);
+
+            // 既存のタスクのpositionを更新
+            $queryBuilder
+                ->update('Shu1SimulistBundle:Lists', 'l')
+                ->set('l.position', 'l.position + 1')
+                ->where('l.project = :project')
+                ->setParameter('project', $project);
+
+            $queryBuilder->getQuery()->execute();
+
+            $entityManager->flush();
+            $connection->commit();
+
+        } catch (\Exception $exception) {
+            $connection->rollback();
+            $this->get('logger')->error($exception->getMessage());
+            return new Response($exception->getMessage(), 503);
         }
-
-        $entityManager->persist($lists);
-        $entityManager->flush();
 
         // 追加したタスクのIDを取得(=Last Insert ID)
         $id = $lists->getId();
@@ -148,7 +177,7 @@ class ProjectController extends Controller
                 ->set('l.status', $status)
                 ->where('l.id = :id')
                 ->setParameter('id', $id);
-            $result = $queryBuilder->getQuery()->execute();
+            $queryBuilder->getQuery()->execute();
             $entityManager->flush();
         } catch (\Exception $exception) {
             $this->get('logger')->error($exception->getMessage());
