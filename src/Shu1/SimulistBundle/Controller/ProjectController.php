@@ -53,8 +53,7 @@ class ProjectController extends Controller
                 ->where('p.identify = :identify')
                 ->setParameter('identify', $identify)
                 ->orderBy('l.position', 'ASC')
-                ->addOrderBy('l.createdAt', 'DESC')
-            ;
+                ->addOrderBy('l.createdAt', 'DESC');
             $lists = $queryBuilder->getQuery()->getResult();
         } catch (\Exception $exception) {
             $this->get('logger')->error($exception->getMessage());
@@ -130,6 +129,7 @@ class ProjectController extends Controller
 
         } catch (\Exception $exception) {
             $this->get('logger')->error($exception->getMessage());
+
             return new Response($exception->getMessage(), 503);
         }
 
@@ -164,8 +164,7 @@ class ProjectController extends Controller
                 ->where('l.id = :id')
                 ->setParameter('id', $id)
                 ->setParameter('status', $status)
-                ->setParameter('now', new \DateTime())
-            ;
+                ->setParameter('now', new \DateTime());
             $queryBuilder->getQuery()->execute();
             $entityManager->flush();
         } catch (\Exception $exception) {
@@ -238,9 +237,37 @@ class ProjectController extends Controller
     public function sortAction(Request $request)
     {
         // TODO レスポンス形式はとりあえず適当
-        $this->get('logger')->info(print_r($request->get('sort'), true));
+        parse_str($request->get('sort'));
+        $entityManager = $this->getDoctrine()->getManager();
+        $queryBuilder  = $entityManager->createQueryBuilder();
+
+        $entityManager->getConnection()->beginTransaction();
+
+        try {
+
+            foreach ($task as $position => $id) {
+                $queryBuilder
+                    ->update('Shu1SimulistBundle:Lists', 'l')
+                    ->set('l.position', ':position')
+                    ->set('l.updatedAt', ':now')
+                    ->where('l.id = :id')
+                    ->setParameter('id', $id)
+                    ->setParameter('position', $position)
+                    ->setParameter('now', new \DateTime());
+                $queryBuilder->getQuery()->execute();
+                $entityManager->flush();
+            }
+
+            $entityManager->getConnection()->commit();
+
+        } catch (\Exception $exception) {
+            $entityManager->getConnection()->rollback();
+            $this->get('logger')->error($exception->getMessage());
+
+            return new Response('ng', 503);
+        }
 
         return new Response('ok', 200);
     }
 
-} 
+}
