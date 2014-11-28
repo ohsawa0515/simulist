@@ -141,10 +141,50 @@ class ProjectController extends Controller
     }
 
     /**
+     * タスクの更新
+     *
+     * @Route("/update/", name="project_update")
+     * @Method("POST")
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function updateAction(Request $request)
+    {
+        // TODO レスポンス形式はとりあえず適当
+        $id     = $request->get('id');
+        $task   = $request->get('task');
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $queryBuilder  = $entityManager->createQueryBuilder();
+        try {
+            $queryBuilder
+                ->update('Shu1SimulistBundle:Lists', 'l')
+                ->set('l.todo', ':task')
+                ->set('l.updatedAt', ':now')
+                ->where('l.id = :id')
+                ->setParameter('id', $id)
+                ->setParameter('task', $task)
+                ->setParameter('now', new \DateTime());
+            $queryBuilder->getQuery()->execute();
+            $entityManager->flush();
+        } catch (\Exception $exception) {
+            $this->get('logger')->error($exception->getMessage());
+
+            return new Response('ng', 404);
+        }
+
+        return new Response('ok', 200);
+    }
+
+    /**
      * タスクの完了
      *
      * @Route("/done/", name="project_done")
      * @Method({"POST"})
+     *
+     * @param Request $request
      *
      * @return Respose
      */
