@@ -85,6 +85,10 @@ doctrine:
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
         auto_mapping: true
+        filters:
+            softdeleteable:
+                class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
+                enabled: true
 
 # Doctrine Extension
 stof_doctrine_extensions:
@@ -93,6 +97,7 @@ stof_doctrine_extensions:
         default:
             timestampable: true
             softdeleteable: true
+            sortable: true
 
 # Swiftmailer Configuration
 swiftmailer:

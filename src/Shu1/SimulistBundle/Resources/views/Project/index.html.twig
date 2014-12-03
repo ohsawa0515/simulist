@@ -1,0 +1,242 @@
+{% extends '@Shu1Simulist/base.html.twig' %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block header_javascripts %}
+    {{ parent() }}
+    <script>
+
+        // Ajax通信時にトークンを埋め込む
+        var csrf_token = '{{ csrf_token }}';
+        $(window).on('ajaxSend', function (elm, xhr, s) {
+            xhr.setRequestHeader('X-CSRF-Token', csrf_token);
+        });
+
+        $(function () {
+
+            $('#input-task').focus();
+
+            // タスクの追加
+            $('#add-task').click(function () {
+
+                event.preventDefault();
+
+                var task = $('#input-task').val(),
+                        identify = $('#input-identify').val();
+
+                $.ajax({
+                    url    : "{{ path('project_add') }}",
+                    type   : "POST",
+                    data   : {
+                        "task"    : task,
+                        "identify": identify
+                    },
+                    success: function (id) {
+                        var e = $(
+                                '<tr id="task_' + id + '" data-id="' + id + '">' +
+                                        '<td>' +
+                                        '<input type="checkbox" class="done-task" value="' + id + '">' +
+                                        '</td>' +
+                                        '<td>' +
+                                        '<span class="edit-task">' + task + '</span>' +
+                                        '</td>' +
+                                        '<td></td>' +
+                                        '<td>' +
+                                        '<button type="button" class="delete-task btn btn-link">Delete</button>' +
+                                        '</td>' +
+                                        '</tr>'
+                        );
+                        $('tbody').prepend(e);
+                        $('#input-task').val('').focus();
+                    },
+                    error  : function (data) {
+                        console.log(data);
+                    }
+
+                });
+            });
+            //<input type="text" class="form-control col-md-12" id="input-task" placeholder="タスクを入力してください">
+            //<button type="submit" id="add-task" class="btn btn-primary">登録</button>
+            // タスクの編集
+            $(document).on('click', '.edit-task', function () {
+                var task_id = $(this).parent().parent().data('id');
+                var task = $(this).text();
+                var e = $(
+                        '<div class="col-md-8">' +
+                                '<input type="text" id="update-task" class="form-control" value="' + task + '">' +
+                                '</div>' +
+                                '<div class="col-md-1">' +
+                                '<button type="submit" class="btn btn-primary update-task">更新</button>' +
+                                '</div>' +
+                                '<div class="col-md-1">' +
+                                '<button type="submit" class="btn btn-danger input-cancel">キャンセル</button>' +
+                                '</div>'
+                );
+                $('tr#task_' + task_id + ' > td:eq(1)').empty().append(e);
+                $('#task_' + task_id + ' > td:eq(1) > div > input:eq(0)').focus();
+            });
+
+            // タスク編集の更新
+            $(document).on('click', '.update-task', function () {
+                var task_id = $(this).closest('tr').data('id');
+                var task = $(this).closest('tr').find('td:eq(1) input').val();
+
+                $.ajax({
+                    url    : "{{ path('project_update') }}",
+                    type   : "POST",
+                    data   : {
+                        "id"  : task_id,
+                        "task": task
+                    },
+                    success: function (data) {
+                        $('tr#task_' + task_id + ' > td:eq(1)')
+                                .empty()
+                                .append('<span class="edit-task">' + task + '</span>');
+                    },
+                    error  : function (data) {
+                        console.log(data);
+                    }
+                });
+            });
+
+            // タスク編集のキャンセル
+            $(document).on('click', '.input-cancel', function () {
+                var task_id = $(this).closest('tr').data('id');
+                var task = $(this).closest('tr').find('td:eq(1) input').val();
+                $('tr#task_' + task_id + ' > td:eq(1)')
+                        .empty()
+                        .append('<span class="edit-task">' + task + '</span>');
+            });
+
+            // タスクの完了
+            $(document).on('click', '.done-task', function () {
+                var task_id = $(this).parent().parent().data('id');
+                var input = $(this);
+                var status;
+                if ($(this).hasClass('done')) {
+                    // タスク完了の場合は未完了
+                    status = 0;
+                } else {
+                    // タスク未完了の場合は完了
+                    status = 1;
+                }
+                $.ajax({
+                    url    : "{{ path('project_done') }}",
+                    type   : "POST",
+                    data   : {
+                        "id"    : task_id,
+                        "status": status
+                    },
+                    // TODO タスク編集中に完了するとタスクが編集できない
+                    // TODO 完了後に一番下に移動させたい
+                    success: function (data) {
+                        if (input.hasClass('done')) {
+                            input.removeClass('done');
+                            $('tr#task_' + task_id).children('td:eq(1)').children().children().removeClass('text-muted').unwrap();
+                        } else {
+                            input.addClass('done');
+                            $('tr#task_' + task_id).children('td:eq(1)').children().addClass('text-muted').wrap('<del />');
+                        }
+                    },
+                    error  : function (data) {
+                        console.log(data);
+                    }
+                });
+            });
+
+            // タスクの削除
+            $(document).on('click', '.delete-task', function () {
+                if (confirm('タスクを削除してもよろしいですか?')) {
+                    var task_id = $(this).parent().parent().data('id'),
+                            project_id = $('table.todo').data('project');
+                    $.ajax({
+                        url    : "{{ path('project_delete') }}",
+                        type   : "POST",
+                        data   : {
+                            "identify": project_id,
+                            "id"      : task_id
+                        },
+                        success: function (data) {
+                            $('#task_' + task_id).fadeOut(800);
+                        },
+                        error  : function (data) {
+                            console.log(data);
+                        }
+                    });
+                }
+            });
+
+            // タスクの並び替え
+            $("table.todo tbody").sortable({
+                axis   : 'y',
+                opacity: 0.1,
+                update : function () {
+                    $.ajax({
+                        url : "{{ path('project_sort') }}",
+                        type: "POST",
+                        data: {
+                            sort: $(this).sortable('serialize')
+                        }
+                    })
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
+
+{% block body %}
+    <h1>{{ project.name }}</h1>
+
+    <!-- form -->
+    <form class="form-horizontal" role="form" action="" method="post">
+        <div class="col-md-10">
+            <div class="form-group">
+                <input type="text" class="form-control col-md-12" id="input-task" placeholder="タスクを入力してください">
+                <input type="hidden" id="input-identify" value="{{ project.identify }}">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" id="add-task" class="btn btn-primary">登録</button>
+        </div>
+    </form>
+
+    <!-- Table -->
+    <table class="todo table" data-project="{{ project.identify }}">
+        <thead>
+        <th>done</th>
+        <th>todo</th>
+        <th>limit</th>
+        <th>delete</th>
+        </thead>
+        <tbody>
+        {% for list in lists %}
+            <tr id="task_{{ list.id }}" data-id="{{ list.id }}">
+                <td>
+                    {# status = 1 => done #}
+                    {% if list.status == 1 %}
+                        <input type="checkbox" class="done done-task" value="{{ list.id }}" checked>
+                    {% else %}
+                        <input type="checkbox" class="done-task" value="{{ list.id }}">
+                    {% endif %}
+                </td>
+                <td>
+                    {% if list.status == 1 %}
+                        <del><span class="text-muted">{{ list.todo }}</span></del>
+                    {% else %}
+                        <span class="edit-task">{{ list.todo }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if list.timeLimit is not empty %}
+                        {{ list.timeLimit|date('Y-m-d H:i:s') }}
+                    {% endif %}
+                </td>
+                <td>
+                    <button type="button" class="delete-task btn btn-link">Delete</button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends '@Shu1Simulist/base.html.twig' %}
+
+{% form_theme form '@Shu1Simulist/form_errors.html.twig' %}
+
+{% block title %}リストの新規作成{% endblock %}
+
+{% block body %}
+    {% if not form.vars.valid %}
+        <div class="alert alert-danger">
+            {% for error in form %}
+                {{ form_errors(error) }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <form class="form-horizontal" role="form" action="" method="post" {{ form_enctype(form) }}>
+
+        {% if form.name.vars.valid %}
+            {% set class = 'form-group' %}
+        {% else %}
+            {% set class = 'form-group has-error' %}
+        {% endif %}
+
+        <div class="{{ class }}">
+            <label for="inputName" class="col-md-2 control-label">{{ form_label(form.name) }}(必須)</label>
+
+            <div class="col-md-10">
+                {{ form_widget(form.name, { 'attr': { 'class': 'form-control', 'placeholder': '買い物リスト' } }) }}
+            </div>
+        </div>
+
+        {{ form_widget(form) }}
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-md-10">
+                <button type="submit" class="btn btn-primary">作成</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

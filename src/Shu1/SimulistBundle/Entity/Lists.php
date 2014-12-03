@@ -33,6 +33,7 @@ class Lists
     /**
      * @var integer
      *
+     * @Gedmo\SortablePosition
      * @ORM\Column(name="position", type="integer", nullable=true)
      */
     private $position;
@@ -98,6 +99,7 @@ class Lists
     /**
      * @var \Project
      *
+     * @Gedmo\SortableGroup
      * @ORM\ManyToOne(targetEntity="Project")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="project_id", referencedColumnName="id")

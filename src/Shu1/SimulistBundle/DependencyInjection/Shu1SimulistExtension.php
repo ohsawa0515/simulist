@@ -22,7 +22,15 @@ class Shu1SimulistExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.yml');
+
+        // validation.yml
+        $validators = $container->getParameter('validator.mapping.loader.yaml_files_loader.mapping_files');
+        $add_files  = glob(dirname(__DIR__) . '/Resources/config/validator/*.yml');
+        foreach ($add_files as $file) {
+            $validators[] = $file;
+        }
+        $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $validators);
     }
 }
